@@ -9,20 +9,27 @@ var obstaclesGroup;
 var coinGroup;
 var score=0;
 var win;
+var bg,ghost;
 
 function preload(){
   playerImg=loadAnimation("sprites/tile000.png");
   coinImg=loadImage("sprites/coin.png");
+bg=loadImage("sprites/bg1.jpg");
+ghost=loadImage("sprites/ghost.png");
 }
 
 function setup() {
   createCanvas(800,400);
- player= createSprite(200, 320, 50, 50);
+ player= createSprite(200, 280, 50, 50);
  player.addAnimation("cycing",playerImg);
  player.scale=0.2;
  win=createSprite(600,300,10,10);
  win.visible=false;
- ground=createSprite(200,360,800,20);
+ back=createSprite(width/2,height/2,width,height);
+ back.addImage(bg);
+ back.scale=1.8;
+ ground=createSprite(400,320,800,20);
+ ground.visible=false;
  obstaclesGroup=new Group();
   coinGroup=new Group();
   textSize(30);
@@ -32,15 +39,17 @@ function setup() {
 function draw() {
   background(0);  
   text("Score: "+score,600,50);
+  player.depth=back.depth+1
+  win.depth=back.depth+1;
   if(gameState===1){
-    ground.velocityX=-7;
+    back.velocityX=-7;
     
     
-    if(ground.x<0){
-      ground.x=400;
+    if(back.x<0){
+      back.x=back.width/2;
     }
    
-    if(keyIsDown(32)&& player.y>=310.5){
+    if(keyIsDown(32)&& player.y>=270.5){
       player.velocityY=-30;
      
     }
@@ -58,21 +67,31 @@ if(player.isTouching(obstaclesGroup)){
   gameState=0;
 }
   }else if(gameState===0){ 
-    ground.velocityX=0;
+    back.velocityX=0;
    obstaclesGroup.setVelocityXEach(0);
    coinGroup.setVelocityXEach(0);
    obstaclesGroup.setLifetimeEach(-3);
    coinGroup.setLifetimeEach(-3);
    player.velocityY=0;
+   textSize(50);
+      textFont("Georgia");
+      fill(255);
+
+      text("You WIN",400,200)
+   
   }else if(gameState===2){
     player.velocityY=player.velocityY+2;
     win.visible=true;
     win.velocityX=-7 
-    if(ground.x<0){
-      ground.x=400;
-    }                  
+    back.velocityX=-7;
+    
+    
+      if(back.x<0){
+        back.x=back.width/2;
+      }
+
     if(player.isTouching(win)){
-      ground.velocityX=0;
+      back.velocityX=0;
       win.velocityX=0
       obstaclesGroup.destroyEach();
       coinGroup.destroyEach();
@@ -81,6 +100,7 @@ if(player.isTouching(obstaclesGroup)){
       fill(255);
 
       text("You WIN",400,200)
+     
     }
   }
 
@@ -94,7 +114,9 @@ if(player.isTouching(obstaclesGroup)){
 }
 function obstacles(){
   if(frameCount%100===0){
-  var obstacle=createSprite(800,320,30,30);
+  var obstacle=createSprite(800,280,30,30);
+  obstacle.addImage(ghost);
+  obstacle.scale=0.8;
   obstacle.shapeColor="red";
   obstacle.velocityX=-15;
   obstacle.lifetime=400;
@@ -104,7 +126,7 @@ function obstacles(){
 }
 function coin(){
   if(frameCount%200===0){
-    var coin=createSprite(800,230,15,15);
+    var coin=createSprite(800,200,15,15);
     coin.velocityX=-5;
     coin.shapeColor="gold";
     coin.addImage(coinImg);
